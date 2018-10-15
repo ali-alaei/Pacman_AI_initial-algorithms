@@ -10,13 +10,14 @@ def tinyMazeSearch(problem):
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
     sequence of moves will be incorrect, so only use this for tinyMaze.
     """
+
     s = Directions.SOUTH
     w = Directions.WEST
     n = Directions.NORTH
     e = Directions.EAST
     right = Directions.RIGHT
     print "this is right direction : " + Directions.RIGHT[w]
-    return [s, s, w, s, w, w, s, w]
+    return ['South', 'South', 'West', 'South', 'West', 'West', 'South', 'West']
 
 
 def right_hand_maze_search(problem):
@@ -34,28 +35,51 @@ def right_hand_maze_search(problem):
     :return: list of actions
     """
     "*** YOUR CODE HERE ***"
-    current_state = problem.getStartstate()
+    print "search called"
+    path_to_goal = ['West']
+    pacman_direction = path_to_goal[len(path_to_goal)-2]
+    current_state = problem.getStartState()
+    print "current_state:", current_state
     next_states = problem.getNextStates(current_state)
+    print "next_states:", next_states
     for state in next_states:
-        next_next_states = problem.getNextStates(state)
+        print "state in next_states:", state
+        print "state[0]:", state[0]
+        next_state_walls = calculate_walls(state[0], problem)
+        for wall in next_state_walls:
+            print "right of next position:", Directions.RIGHT[state[1]]
+            if Directions.RIGHT[state[1]] == wall and pacman_direction == state[1]:
+                path_to_goal.append(state[1])
+                if problem.isGoalState(state[1]):
+                    goal_reached = True
+                print "path_to_goal", path_to_goal
+    print "path_to_goal:", path_to_goal
+    # return path_to_goal
 
 
 def calculate_walls(state, problem):
-    next_states = problem.getNextStates(state)
+    current_state_next_states = problem.getNextStates(state)
+    print "current_state_next_states:", current_state_next_states
     all_directions = ['North', 'East', 'South', 'West']
-    next_state_directions = next_states[0]
-    for state in next_states:
-        directions = state[1]
+    current_state_directions = get_state_directions(current_state_next_states)
+    wall_directions = set(all_directions) - set(current_state_directions)
+    print "wall_directions:", wall_directions
+    return wall_directions
+
+
+def get_state_directions(state_array):
+    state_directions = []
+    for state in state_array:
+        state_directions.append(state[1])
+        print "state_directions:", state_directions
+    return state_directions
 
 
 
 
 
-    # print "Start's next states:", problem.getNextStates(problem.getStartState())
+
     # base_next_states = problem.getNextStates(problem.getStartState())
-    # print "next_state array:", base_next_states
-    # print "in nextstate:", base_next_states[0]
-    # print "next_state array:", base_next_states
     # for state in base_next_states:
     #     print "state:", state
     #     print "state[0]:", state[0]
