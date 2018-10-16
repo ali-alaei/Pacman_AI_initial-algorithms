@@ -35,25 +35,30 @@ def right_hand_maze_search(problem):
     :return: list of actions
     """
     "*** YOUR CODE HERE ***"
-    print "search called"
     path_to_goal = ['West']
-    pacman_direction = path_to_goal[len(path_to_goal)-2]
     current_state = problem.getStartState()
-    print "current_state:", current_state
-    next_states = problem.getNextStates(current_state)
-    print "next_states:", next_states
-    for state in next_states:
-        print "state in next_states:", state
-        print "state[0]:", state[0]
-        next_state_walls = calculate_walls(state[0], problem)
-        for wall in next_state_walls:
-            print "right of next position:", Directions.RIGHT[state[1]]
-            if Directions.RIGHT[state[1]] == wall and pacman_direction == state[1]:
-                path_to_goal.append(state[1])
-                if problem.isGoalState(state[1]):
-                    goal_reached = True
-                print "path_to_goal", path_to_goal
-    print "path_to_goal:", path_to_goal
+    print "initial state:", current_state
+    goal_reached = False
+    while not goal_reached:
+        print "search executed"
+        current_pacman_direction = path_to_goal[len(path_to_goal) - 1]
+        next_states = problem.getNextStates(current_state)
+        print "next_states:", next_states
+        for state in next_states:
+            print "state in next_states:", state
+            print "state[0]:", state[0]
+            next_state_walls = calculate_walls(state[0], problem)
+            for wall in next_state_walls:
+                print "right of next position:", Directions.RIGHT[state[1]]
+                # if Directions.RIGHT[state[1]] == wall and Directions.RIGHT[current_pacman_direction] == wall:
+                if Directions.RIGHT[state[1]] == wall:
+                    path_to_goal.append(state[1])
+                    current_state = state[0]
+                    print "current_state:", current_state
+                    if problem.isGoalState(state):
+                        goal_reached = True
+                    print "path_to_goal", path_to_goal
+        print "path_to_goal:", path_to_goal
     # return path_to_goal
 
 
