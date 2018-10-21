@@ -99,9 +99,23 @@ def dfs(problem):
     """
     Q2: Search the deepest nodes in the search tree first.
     """
+    current_state = problem.getStartState()
+    visited = []
+    next_states = problem.getNextStates(current_state)
+    visited.append(next_states[0])
+    print "nexts: ", next_states
+
+    un_visited = set(visited) - set(next_states)
+    if len(un_visited) > 1:
+        print "choose one randomly + push it to stack"
+    current_state = un_visited
+
+    visited.append(un_visited)
+    print "visit and nexts common: ", set(visited) & set(next_states)
+
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
 
 
 def bfs(problem):
