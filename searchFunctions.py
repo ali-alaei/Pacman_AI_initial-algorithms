@@ -96,27 +96,17 @@ def dfs(problem):
     """
     Q2: Search the deepest nodes in the search tree first.
     """
-
-    '''
-    this is for test
-    '''
-    # a = [(5, 4)]
-    # b = [((5, 4), 'South', 1)]
-    # c = b[0]
-    # diff = set(b[0]) - set(a)
-    # print "diff = ", diff
+    "*** YOUR CODE HERE ***"
 
     stack = util.Stack()
-
     current_state = problem.getStartState()  # this is for the beginning.
     print "begininng_current_state = ", current_state
     visited = [current_state]
     stack.push(current_state)
+    poped_from_stack = []
     print "visited = ", visited
-    path_to_goal = []
-
-    goal_reached = False
-    while not goal_reached:
+    while not problem.isGoalState(current_state):
+        print "stack_size = ", len(stack.list)
         tmp_next_states = problem.getNextStates(current_state)
         next_states = []
         print "tmp_next_states = ", tmp_next_states
@@ -136,6 +126,9 @@ def dfs(problem):
             # one of them must be chosen randomly.
             # print "choose one randomly + push it to stack"
             # next_states_size = len(next_states) //  this is wrong beacause we must choose from unvisited nodes not next nodes.
+            for state in poped_from_stack:
+                if current_state == state:
+                    stack.push(current_state)
             unvisited_list_size = len(unvisited_list)
             # print "next_states_size = ", next_states_size
             next_state_to_go = random.randint(0, unvisited_list_size - 1)
@@ -146,6 +139,9 @@ def dfs(problem):
             print "stack in first if = ", stack.list
             print "visited in first if = ", visited
         elif len(unvisited_list) == 1:
+            for state in poped_from_stack:
+                if current_state == state:
+                    stack.push(current_state)
             current_state = unvisited_list[0]
             stack.push(current_state)
             visited.append(current_state)
@@ -153,25 +149,22 @@ def dfs(problem):
             print "stack in second if = ", stack.list
             print "visited in second if = ", visited
         elif len(unvisited_list) == 0:  # means all the nodes are visited,  so we must backtrack.
-            stack.pop()
+            #stack.pop()
             current_state = stack.pop()
+            poped_from_stack.append(current_state)
             print "current_state in third if = ", current_state
             print "stack in third if = ", stack.list
             print "visited in third if = ", visited
+            # print "poped_from_stack in third if = ", poped_from_stack
             # stack.push(current_state)
             # visited.append(current_state)
-        if problem.isGoalState(current_state):
-            goal_reached = True  # it could be while condition.
-            print "goal_reached"
-            print "stack = ", stack.list
-            print "stack length = ", len(stack.list)
-            path_to_goal = convert_coordinates_to_directions(stack.list)
-            return path_to_goal
-            # path_to_goal = stack  // first we should take diff of two positions and then send it to Actions.vectorToDirection
-    # return path_to_goal
-    # print "visit and nexts common: ", set(visited) & set(next_states)
-
-    "*** YOUR CODE HERE ***"
+        if stack.isEmpty():
+            return ['Stop']
+    print "goal_reached"
+    print "stack = ", stack.list
+    print "stack length = ", len(stack.list)
+    path_to_goal = convert_coordinates_to_directions(stack.list)
+    return path_to_goal
     # util.raiseNotDefined()
 
 
@@ -188,21 +181,16 @@ def convert_coordinates_to_directions(coordinates):
     return directions
 
 
-
-
 def bfs(problem):
     """
     Q3: Search the shallowest nodes in the search tree first.
     """
-
     "*** YOUR CODE HERE ***"
     queue = util.Queue()
     visited = []
-
     queue.push((problem.getStartState(), [], 0))
     (state, next_direction, cost) = queue.pop()
     visited.append(state)
-    goal_reached = False
     while not problem.isGoalState(state):
         next_states = problem.getNextStates(state)
         for state in next_states:
@@ -218,36 +206,24 @@ def ucs(problem):
     """
     Q6: Search the node of least total cost first.
     """
-
     "*** YOUR CODE HERE ***"
-    # initialization
     priority_queue = util.PriorityQueue()
     visited = []
-
-    # push the starting point into queue
-    priority_queue.push((problem.getStartState(), [], 0), 0)  # push starting point with priority num of 0
-    # pop out the point
+    priority_queue.push((problem.getStartState(), [], 0), 0)
     (state, toDirection, cost) = priority_queue.pop()
-    # add the point to visited list
     visited.append((state, cost))
-
-    while not problem.isGoalState(state):  # while we do not find the goal point
-        next_states = problem.getNextStates(state)  # get the point's succesors
+    while not problem.isGoalState(state):
+        next_states = problem.getNextStates(state)
         for state in next_states:
             is_visited = False
             total_cost = cost + state[2]
             for (visited_state, visited_cost) in visited:
-                # we add the point only if the successor has not been visited, or has been visited but now with a lower cost than the previous one
                 if (state[0] == visited_state) and (total_cost >= visited_cost):
-                    is_visited = True  # point recognized visited
+                    is_visited = True
                     break
-
             if not is_visited:
-                # push the point with priority num of its total cost
                 priority_queue.push((state[0], toDirection + [state[1]], cost + state[2]), cost + state[2])
-                visited.append((state[0], cost + state[2]))  # add this point to visited list
-
+                visited.append((state[0], cost + state[2]))
         (state, toDirection, cost) = priority_queue.pop()
-
     return toDirection
-    #util.raiseNotDefined()
+    # util.raiseNotDefined()
