@@ -196,7 +196,22 @@ def bfs(problem):
     """
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.Queue()
+    visited = []
+
+    queue.push((problem.getStartState(), [], 0))
+    (state, next_direction, cost) = queue.pop()
+    visited.append(state)
+    goal_reached = False
+    while not problem.isGoalState(state):
+        next_states = problem.getNextStates(state)
+        for state in next_states:
+            if not state[0] in visited:
+                queue.push((state[0], next_direction + [state[1]], cost + state[2]))
+                visited.append(state[0])
+        (state, next_direction, cost) = queue.pop()
+    return next_direction
+    # util.raiseNotDefined()
 
 
 def ucs(problem):
@@ -205,4 +220,34 @@ def ucs(problem):
     """
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # initialization
+    priority_queue = util.PriorityQueue()
+    visited = []
+
+    # push the starting point into queue
+    priority_queue.push((problem.getStartState(), [], 0), 0)  # push starting point with priority num of 0
+    # pop out the point
+    (state, toDirection, cost) = priority_queue.pop()
+    # add the point to visited list
+    visited.append((state, cost))
+
+    while not problem.isGoalState(state):  # while we do not find the goal point
+        next_states = problem.getNextStates(state)  # get the point's succesors
+        for state in next_states:
+            is_visited = False
+            total_cost = cost + state[2]
+            for (visited_state, visited_cost) in visited:
+                # we add the point only if the successor has not been visited, or has been visited but now with a lower cost than the previous one
+                if (state[0] == visited_state) and (total_cost >= visited_cost):
+                    is_visited = True  # point recognized visited
+                    break
+
+            if not is_visited:
+                # push the point with priority num of its total cost
+                priority_queue.push((state[0], toDirection + [state[1]], cost + state[2]), cost + state[2])
+                visited.append((state[0], cost + state[2]))  # add this point to visited list
+
+        (state, toDirection, cost) = priority_queue.pop()
+
+    return toDirection
+    #util.raiseNotDefined()

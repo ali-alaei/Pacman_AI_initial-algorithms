@@ -270,4 +270,12 @@ class DangerousPositionSearch(PositionSearchProblem):
         :param state: tuple (x,y)
         :return: int
         """
-        util.raiseNotDefined()
+        for i in self.ghosts:
+            x_ghost = i[0]
+            y_ghost = i[1]
+            for j in range(-1, 2):
+                for k in range(-1, 2):
+                    if x_ghost + j == state[0] and y_ghost + j == state[1]:
+                        return 100000
+        return 1
+        #util.raiseNotDefined()
