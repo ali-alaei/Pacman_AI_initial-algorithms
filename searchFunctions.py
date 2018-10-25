@@ -1,6 +1,7 @@
 import util
 
 from game import Directions
+import random
 
 UNREACHABLE_GOAL_STATE = [Directions.STOP]
 
@@ -79,11 +80,6 @@ def get_state_directions(state_array):
         print "state_directions:", state_directions
     return state_directions
 
-
-
-
-
-
     # base_next_states = problem.getNextStates(problem.getStartState())
     # for state in base_next_states:
     #     print "state:", state
@@ -99,20 +95,55 @@ def dfs(problem):
     """
     Q2: Search the deepest nodes in the search tree first.
     """
-    current_state = problem.getStartState()
-    visited = []
-    next_states = problem.getNextStates(current_state)
-    visited.append(next_states[0])
-    print "nexts: ", next_states
 
-    un_visited = set(visited) - set(next_states)
-    if len(un_visited) > 1:
-        print "choose one randomly + push it to stack"
-    current_state = un_visited
+    '''
+    this is for test
+    '''
+    # a = [(5, 4)]
+    # b = [((5, 4), 'South', 1)]
+    # c = b[0]
+    # diff = set(b[0]) - set(a)
+    # print "diff = ", diff
 
-    visited.append(un_visited)
+    stack = util.Stack()
+    current_state = problem.getStartState()  # this is for the beginning.
+    visited = [current_state]
+    path_to_goal = []
+    goal_reached = False
+    while not goal_reached:
+        next_states = problem.getNextStates(current_state)
+        print "next_states = ", next_states
+        for index in range(0, len(next_states)):  # to solve start state problem.
+            current_object = next_states[index]
+            if current_object[0] == visited[0]:
+                next_states.pop(index)
+        un_visited = set(next_states) - set(visited)
+        if len(un_visited) > 1:      # means there are more than one child for our parent,
+            # one of them must be chosen randomly.
+            print "choose one randomly + push it to stack"
+            next_states_size = len(next_states)
+            print "next_states_size", next_states_size
+            next_state_to_go = random.randint(0, next_states_size - 1)
+            current_state = next_states[next_state_to_go]
+            stack.push(current_state)
+            visited.append(current_state)
+        elif len(un_visited) == 1:
+            current_state = un_visited
+            stack.push(current_state)
+            visited.append(current_state)
+        # there is another condition which is len = 0, i don't know what should i do on that condition yet.
+        elif len(un_visited) == 0:  # means all the nodes are visited,  so we must backtrack.
+            stack.pop()
+            current_state = stack.pop()
+        # stack.push(current_state)
+        # visited.append(current_state)
+        if problem.isGoalState(current_state):
+            goal_reached = True  # it could be while condition.
+            # path_to_goal = stack  # as we store whole object in the stack, we must refine it to have just directions
+            for state in stack:                                          # in order to store it in our "path_to_goal".
+                path_to_goal.append(state[1])
+    return path_to_goal
     print "visit and nexts common: ", set(visited) & set(next_states)
-
 
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
