@@ -2,7 +2,8 @@ import util
 
 from game import Directions
 import random
-
+import numpy
+import game
 UNREACHABLE_GOAL_STATE = [Directions.STOP]
 
 
@@ -106,47 +107,87 @@ def dfs(problem):
     # print "diff = ", diff
 
     stack = util.Stack()
+
     current_state = problem.getStartState()  # this is for the beginning.
+    print "begininng_current_state = ", current_state
     visited = [current_state]
+    stack.push(current_state)
+    print "visited = ", visited
     path_to_goal = []
+
     goal_reached = False
     while not goal_reached:
-        next_states = problem.getNextStates(current_state)
+        tmp_next_states = problem.getNextStates(current_state)
+        next_states = []
+        print "tmp_next_states = ", tmp_next_states
+        for state in tmp_next_states:
+            next_states.append(state[0])
+        # for index in range(0, len(next_states)):  # to solve start state problem.start state was just a coordinate while others was a full object.
+        #     print "index = ", index
+        #     print "next_states[index] = ", next_states[index]
+        #     current_object = next_states[index]
+        #     if current_object[0] == visited[0]:
+        #         next_states.pop(index)
         print "next_states = ", next_states
-        for index in range(0, len(next_states)):  # to solve start state problem.
-            current_object = next_states[index]
-            if current_object[0] == visited[0]:
-                next_states.pop(index)
-        un_visited = set(next_states) - set(visited)
-        if len(un_visited) > 1:      # means there are more than one child for our parent,
+        unvisited_set = set(next_states) - set(visited)
+        unvisited_list = list(unvisited_set)
+        print "unvisited_list = ", unvisited_list
+        if len(unvisited_list) > 1:      # means there are more than one child for our parent,
             # one of them must be chosen randomly.
-            print "choose one randomly + push it to stack"
-            next_states_size = len(next_states)
-            print "next_states_size", next_states_size
-            next_state_to_go = random.randint(0, next_states_size - 1)
-            current_state = next_states[next_state_to_go]
+            # print "choose one randomly + push it to stack"
+            # next_states_size = len(next_states) //  this is wrong beacause we must choose from unvisited nodes not next nodes.
+            unvisited_list_size = len(unvisited_list)
+            # print "next_states_size = ", next_states_size
+            next_state_to_go = random.randint(0, unvisited_list_size - 1)
+            current_state = unvisited_list[next_state_to_go]
+            print "current_state in first if = ", current_state
             stack.push(current_state)
             visited.append(current_state)
-        elif len(un_visited) == 1:
-            current_state = un_visited
+            print "stack in first if = ", stack.list
+            print "visited in first if = ", visited
+        elif len(unvisited_list) == 1:
+            current_state = unvisited_list[0]
             stack.push(current_state)
             visited.append(current_state)
-        # there is another condition which is len = 0, i don't know what should i do on that condition yet.
-        elif len(un_visited) == 0:  # means all the nodes are visited,  so we must backtrack.
+            print "current_state in second if = ", current_state
+            print "stack in second if = ", stack.list
+            print "visited in second if = ", visited
+        elif len(unvisited_list) == 0:  # means all the nodes are visited,  so we must backtrack.
             stack.pop()
             current_state = stack.pop()
-        # stack.push(current_state)
-        # visited.append(current_state)
+            print "current_state in third if = ", current_state
+            print "stack in third if = ", stack.list
+            print "visited in third if = ", visited
+            # stack.push(current_state)
+            # visited.append(current_state)
         if problem.isGoalState(current_state):
             goal_reached = True  # it could be while condition.
-            # path_to_goal = stack  # as we store whole object in the stack, we must refine it to have just directions
-            for state in stack:                                          # in order to store it in our "path_to_goal".
-                path_to_goal.append(state[1])
-    return path_to_goal
-    print "visit and nexts common: ", set(visited) & set(next_states)
+            print "goal_reached"
+            print "stack = ", stack.list
+            print "stack length = ", len(stack.list)
+            path_to_goal = convert_coordinates_to_directions(stack.list)
+            return path_to_goal
+            # path_to_goal = stack  // first we should take diff of two positions and then send it to Actions.vectorToDirection
+    # return path_to_goal
+    # print "visit and nexts common: ", set(visited) & set(next_states)
 
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
+
+
+def convert_coordinates_to_directions(coordinates):
+    diffs = []
+    actions = game.Actions()
+    directions = []
+    for i in range(0, len(coordinates)-1):
+        diffs.append(tuple(numpy.subtract(coordinates[i+1], coordinates[i])))
+        print "diffs = ", diffs
+    for diff in diffs:
+        directions.append(actions.vectorToDirection(diff))
+        print "directions = ", directions
+    return directions
+
+
 
 
 def bfs(problem):
