@@ -190,14 +190,25 @@ class ClockwiseFoodProblem(SearchProblem):
         Returns the start state (in your state space, not the full Pacman state space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        x, y = self.startingPosition
+        food_list = []
+        for i in range(len(list(self.foods))):
+            for j in range(len(list(self.foods[i]))):
+                if self.foods[i][j]:
+                    food_list.append((i, j))
+        return x, y, Directions.EAST, tuple(food_list)
+        # util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        position = (state[0], state[1])
+        is_goal_reached = position == self.goal
+        are_foods_finished = len(state[3]) == 0
+        return are_foods_finished and is_goal_reached
+        # util.raiseNotDefined()
 
     def getNextStates(self, state):
         """
@@ -221,9 +232,28 @@ class ClockwiseFoodProblem(SearchProblem):
             #   hitsFood = self.foods[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-
+        # next_states = []
+        food_list = list(state[3])[0:len(list(state[3]))]  # copy list of foods from state
+        last_direction = state[2]
+        x, y = state[0], state[1]
+        for action in [last_direction, Directions.RIGHT[last_direction]]:
+            print "action = ", action
+            dx, dy = Actions.directionToVector(action)
+            next_x, next_y = int(x + dx), int(y + dy)
+            position = (next_x, next_y)
+            if not self.walls[next_x][next_y]:
+                if position in food_list:
+                    new_food_list = food_list[0:len(food_list)]
+                    new_food_list.remove(position)
+                    next_state = (next_x, next_y, action, tuple(new_food_list))
+                    next_states.append((next_state, action, 1))
+                else:
+                    new_food_list = food_list[0:len(food_list)]
+                    next_state = (next_x, next_y, action, tuple(new_food_list))
+                    next_states.append((next_state, action, 1))
         self._expanded += 1  # DO NOT CHANGE
         return next_states
+
 
     def getCostOfActions(self, actions):
         """

@@ -37,19 +37,21 @@ def right_hand_maze_search(problem):
     :return: list of actions
     """
     "*** YOUR CODE HERE ***"
-    path_to_goal = ['West']
+    path_to_goal = ['West']  # I assumed this, for the begininng.
     current_state = problem.getStartState()
     print "initial state:", current_state
     goal_reached = False
     while not goal_reached:
         print "search executed"
         current_pacman_direction = path_to_goal[len(path_to_goal) - 1]
+        print "current_pacman_direction = ", current_pacman_direction
         next_states = problem.getNextStates(current_state)
         print "next_states:", next_states
         for state in next_states:
             print "state in next_states:", state
             print "state[0]:", state[0]
             next_state_walls = calculate_walls(state[0], problem)
+            print "next_state_walls = ", next_state_walls
             for wall in next_state_walls:
                 print "right of next position:", Directions.RIGHT[state[1]]
                 # if Directions.RIGHT[state[1]] == wall and Directions.RIGHT[current_pacman_direction] == wall:
@@ -59,9 +61,10 @@ def right_hand_maze_search(problem):
                     print "current_state:", current_state
                     if problem.isGoalState(state):
                         goal_reached = True
+                        print "goal_reached"
                     print "path_to_goal", path_to_goal
         print "path_to_goal:", path_to_goal
-    # return path_to_goal
+    return path_to_goal
 
 
 def calculate_walls(state, problem):
@@ -71,7 +74,7 @@ def calculate_walls(state, problem):
     current_state_directions = get_state_directions(current_state_next_states)
     wall_directions = set(all_directions) - set(current_state_directions)
     print "wall_directions:", wall_directions
-    return wall_directions
+    return list(wall_directions)
 
 
 def get_state_directions(state_array):
@@ -100,16 +103,16 @@ def dfs(problem):
 
     stack = util.Stack()
     current_state = problem.getStartState()  # this is for the beginning.
-    print "begininng_current_state = ", current_state
+    # print "begininng_current_state = ", current_state
     visited = [current_state]
     stack.push(current_state)
     poped_from_stack = []
-    print "visited = ", visited
+    # print "visited = ", visited
     while not problem.isGoalState(current_state):
-        print "stack_size = ", len(stack.list)
+        # print "stack_size = ", len(stack.list)
         tmp_next_states = problem.getNextStates(current_state)
         next_states = []
-        print "tmp_next_states = ", tmp_next_states
+        # print "tmp_next_states = ", tmp_next_states
         for state in tmp_next_states:
             next_states.append(state[0])
         # for index in range(0, len(next_states)):  # to solve start state problem.start state was just a coordinate while others was a full object.
@@ -118,10 +121,10 @@ def dfs(problem):
         #     current_object = next_states[index]
         #     if current_object[0] == visited[0]:
         #         next_states.pop(index)
-        print "next_states = ", next_states
+        # print "next_states = ", next_states
         unvisited_set = set(next_states) - set(visited)
         unvisited_list = list(unvisited_set)
-        print "unvisited_list = ", unvisited_list
+        # print "unvisited_list = ", unvisited_list
         if len(unvisited_list) > 1:      # means there are more than one child for our parent,
             # one of them must be chosen randomly.
             # print "choose one randomly + push it to stack"
@@ -133,11 +136,11 @@ def dfs(problem):
             # print "next_states_size = ", next_states_size
             next_state_to_go = random.randint(0, unvisited_list_size - 1)
             current_state = unvisited_list[next_state_to_go]
-            print "current_state in first if = ", current_state
+            # print "current_state in first if = ", current_state
             stack.push(current_state)
             visited.append(current_state)
-            print "stack in first if = ", stack.list
-            print "visited in first if = ", visited
+            # print "stack in first if = ", stack.list
+            # print "visited in first if = ", visited
         elif len(unvisited_list) == 1:
             for state in poped_from_stack:
                 if current_state == state:
@@ -145,24 +148,24 @@ def dfs(problem):
             current_state = unvisited_list[0]
             stack.push(current_state)
             visited.append(current_state)
-            print "current_state in second if = ", current_state
-            print "stack in second if = ", stack.list
-            print "visited in second if = ", visited
+            # print "current_state in second if = ", current_state
+            # print "stack in second if = ", stack.list
+            # print "visited in second if = ", visited
         elif len(unvisited_list) == 0:  # means all the nodes are visited,  so we must backtrack.
             #stack.pop()
             current_state = stack.pop()
             poped_from_stack.append(current_state)
-            print "current_state in third if = ", current_state
-            print "stack in third if = ", stack.list
-            print "visited in third if = ", visited
+            # print "current_state in third if = ", current_state
+            # print "stack in third if = ", stack.list
+            # print "visited in third if = ", visited
             # print "poped_from_stack in third if = ", poped_from_stack
             # stack.push(current_state)
             # visited.append(current_state)
         if stack.isEmpty():
             return ['Stop']
-    print "goal_reached"
-    print "stack = ", stack.list
-    print "stack length = ", len(stack.list)
+    # print "goal_reached"
+    # print "stack = ", stack.list
+    # print "stack length = ", len(stack.list)
     path_to_goal = convert_coordinates_to_directions(stack.list)
     return path_to_goal
     # util.raiseNotDefined()
@@ -174,10 +177,10 @@ def convert_coordinates_to_directions(coordinates):
     directions = []
     for i in range(0, len(coordinates)-1):
         diffs.append(tuple(numpy.subtract(coordinates[i+1], coordinates[i])))
-        print "diffs = ", diffs
+        # print "diffs = ", diffs
     for diff in diffs:
         directions.append(actions.vectorToDirection(diff))
-        print "directions = ", directions
+        # print "directions = ", directions
     return directions
 
 
@@ -189,16 +192,16 @@ def bfs(problem):
     queue = util.Queue()
     visited = []
     queue.push((problem.getStartState(), [], 0))
-    (state, next_direction, cost) = queue.pop()
+    (state, next_state, cost) = queue.pop()
     visited.append(state)
     while not problem.isGoalState(state):
         next_states = problem.getNextStates(state)
         for state in next_states:
             if not state[0] in visited:
-                queue.push((state[0], next_direction + [state[1]], cost + state[2]))
+                queue.push((state[0], next_state + [state[1]], cost + state[2]))
                 visited.append(state[0])
-        (state, next_direction, cost) = queue.pop()
-    return next_direction
+        (state, next_state, cost) = queue.pop()
+    return next_state
     # util.raiseNotDefined()
 
 
@@ -210,7 +213,7 @@ def ucs(problem):
     priority_queue = util.PriorityQueue()
     visited = []
     priority_queue.push((problem.getStartState(), [], 0), 0)
-    (state, toDirection, cost) = priority_queue.pop()
+    (state, next_state, cost) = priority_queue.pop()
     visited.append((state, cost))
     while not problem.isGoalState(state):
         next_states = problem.getNextStates(state)
@@ -222,8 +225,8 @@ def ucs(problem):
                     is_visited = True
                     break
             if not is_visited:
-                priority_queue.push((state[0], toDirection + [state[1]], cost + state[2]), cost + state[2])
+                priority_queue.push((state[0], next_state + [state[1]], cost + state[2]), cost + state[2])
                 visited.append((state[0], cost + state[2]))
-        (state, toDirection, cost) = priority_queue.pop()
-    return toDirection
+        (state, next_state, cost) = priority_queue.pop()
+    return next_state
     # util.raiseNotDefined()
